@@ -124,7 +124,7 @@ WordStruct *get_next_random_word(WordStruct *word_struct_ptr)
 {
   int rand_num = get_random_number (word_struct_ptr->amount);
   int index = ZERO;
-  int counter = word_struct_ptr->prob_list[index].amount;
+  int counter = word_struct_ptr->prob_list[index].amount-ONE;
   while (counter < rand_num)
     {
       index ++;
