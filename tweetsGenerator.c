@@ -372,6 +372,7 @@ int main(int argc, char *argv[])
       generate_sentence(&dictionary);
     }
   free_dictionary(&dictionary);
+  fclose(file);
   return 0;
 }
 
