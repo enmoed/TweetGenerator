@@ -199,12 +199,12 @@ void check_mem_alloc (void *temp)
  * @param second_word
  * @return 0 if already in list, 1 otherwise.
  */
-void add_word_to_probability_list(WordStruct *first_word,
+int add_word_to_probability_list(WordStruct *first_word,
                                  WordStruct *second_word)
 {
   if (strcmp(&first_word->word[strlen(first_word->word)-ONE], ".") == ZERO)
     {
-      return;
+      return ZERO;
     }
   if (first_word->prob_list == NULL)
     {
@@ -215,11 +215,11 @@ void add_word_to_probability_list(WordStruct *first_word,
       first_word->prob_list->word_struct_ptr = second_word;
       first_word->prob_list->amount = ONE;
       first_word->len_of_prob_list ++;
-      return;
+      return ONE;
     }
   else if (check_word_in_prob_list(first_word, second_word) == SUCCESS)
     {
-      return;
+      return ONE;
     }
   first_word->len_of_prob_list ++;
   WordProbability *temp = (WordProbability*) realloc(first_word->prob_list,
@@ -229,6 +229,7 @@ void add_word_to_probability_list(WordStruct *first_word,
   first_word->prob_list[first_word->len_of_prob_list-ONE].word_struct_ptr =
       second_word;
   first_word->prob_list[first_word->len_of_prob_list-ONE].amount = ONE;
+  return ZERO;
 }
 
 /**
