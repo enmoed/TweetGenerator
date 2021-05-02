@@ -16,8 +16,11 @@
 #define ZERO 0
 #define TRUE 0
 #define NEGATIVE (-1)
-#define FILE_ERROR "Error: File failed to open\n"
+#define FILE_ERROR "Error: The given file does not exist or access was \
+denied\n"
 #define ALLOCATION_FAILURE "Allocation failure: Failed to allocate memory\n"
+#define INPUT_ERROR "Usage: Please enter <seed value> <tweet amount> <text \
+file> <word amount>\n"
 
 typedef struct WordStruct {
   char *word;
@@ -44,6 +47,7 @@ typedef struct LinkList {
   int size;
 } LinkList;
 
+void check_mem_alloc (void *temp);
 /**
  * Add data to new node at the end of the given link list.
  * @param link_list Link list to add data to
@@ -155,6 +159,12 @@ int generate_sentence(LinkList *dictionary)
   return amount;
 }
 
+/**
+ * checks if the word is in a wordstruct's probability list
+ * @param first_word original wordstruct
+ * @param second_word word we are searching
+ * @return int upon success or failure
+ */
 int check_word_in_prob_list(WordStruct *first_word, WordStruct *second_word)
 {
   for (int i=ZERO; i<first_word->len_of_prob_list; i++)
@@ -167,6 +177,20 @@ int check_word_in_prob_list(WordStruct *first_word, WordStruct *second_word)
     }
   return FAILURE;
 }
+
+/**
+ * function checks memory successful allocation
+ * @param temp pointer to memory
+ */
+void check_mem_alloc (void *temp)
+{
+  if (temp == NULL)
+    {
+      printf(ALLOCATION_FAILURE);
+      exit(EXIT_FAILURE);
+    }
+}
+
 /**
  * Gets 2 WordStructs. If second_word in first_word's prob_list,
  * update the existing probability value.
@@ -186,11 +210,7 @@ void add_word_to_probability_list(WordStruct *first_word,
     {
       WordProbability *prob = (WordProbability*) calloc(ONE, sizeof
           (WordProbability));
-      if (prob == NULL)
-        {
-          printf(ALLOCATION_FAILURE);
-          exit(EXIT_FAILURE);
-        }
+      check_mem_alloc(prob);
       first_word->prob_list = prob;
       first_word->prob_list->word_struct_ptr = second_word;
       first_word->prob_list->amount = ONE;
@@ -204,17 +224,19 @@ void add_word_to_probability_list(WordStruct *first_word,
   first_word->len_of_prob_list ++;
   WordProbability *temp = (WordProbability*) realloc(first_word->prob_list,
         first_word->len_of_prob_list * sizeof(WordProbability));
-  if (temp == NULL)
-    {
-      printf(ALLOCATION_FAILURE);
-      exit(EXIT_FAILURE);
-    }
+  check_mem_alloc(temp);
   first_word->prob_list = temp;
   first_word->prob_list[first_word->len_of_prob_list-ONE].word_struct_ptr =
       second_word;
   first_word->prob_list[first_word->len_of_prob_list-ONE].amount = ONE;
 }
 
+/**
+ * checks if word is in dictionary
+ * @param word
+ * @param dictionary
+ * @return the wordstruct if true
+ */
 WordStruct * word_in_dictionary(char* word, LinkList *dictionary)
 {
   Node *current = dictionary->first;
@@ -233,6 +255,7 @@ WordStruct * word_in_dictionary(char* word, LinkList *dictionary)
     }
   return NULL;
 }
+
 /**
  * Read word from the given file. Add every unique word to the dictionary.
  * Also, at every iteration, update the prob_list of the previous word with
@@ -264,17 +287,9 @@ void fill_dictionary(FILE *fp, int words_to_read, LinkList *dictionary)
               continue;
             }
           WordStruct *temp = (WordStruct *) calloc (ONE, sizeof(WordStruct));
-          if (temp == NULL)
-            {
-              printf(ALLOCATION_FAILURE);
-              exit(EXIT_FAILURE);
-            }
+          check_mem_alloc (temp);
           char *new_word = (char *) malloc ((strlen(word)+ ONE)*sizeof(char));
-          if (new_word == NULL)
-            {
-              printf(ALLOCATION_FAILURE);
-              exit(EXIT_FAILURE);
-            }
+          check_mem_alloc(new_word);
           temp->word = new_word;
           strcpy(temp->word, word);
           temp->amount ++;
@@ -285,8 +300,7 @@ void fill_dictionary(FILE *fp, int words_to_read, LinkList *dictionary)
           previous_word = temp;
           if (add(dictionary, temp) == FAILURE)
             {
-              printf(ALLOCATION_FAILURE);
-              exit(EXIT_FAILURE);
+              check_mem_alloc(NULL);
             }
           word = strtok (NULL, " \n");
         }
@@ -315,22 +329,30 @@ void free_dictionary(LinkList *dictionary)
     }
 }
 
+/**
+ * function checks if inputs are valid
+ * @param argc number of inputs
+ * @return int upon success or fail
+ */
 int check_inputs(int argc)
 {
   if (argc != FIVE && argc != FOUR)
     {
-      printf("Usage: Please enter <seed value> <tweet amount> <text file> "
-             "<word amount>\n");
+      printf(INPUT_ERROR);
       return FAILURE;
     }
   return SUCCESS;
 }
 
+/**
+ * function checks that file is valid
+ * @param file
+ * @return int upon fail or success
+ */
 int check_file(FILE *file)
 {
   if (file == NULL)
     {
-      printf("Error: The given file does not exist or access was denied");
       return FAILURE;
     }
   return SUCCESS;
