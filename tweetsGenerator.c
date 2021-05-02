@@ -143,13 +143,13 @@ int generate_sentence(LinkList *dictionary)
 {
   int amount = ONE;
   WordStruct *current_word = get_first_random_word(dictionary);
-  printf("%s ", current_word->word);
+  printf("%s", current_word->word);
   while (current_word->prob_list != NULL && (amount !=
   MAX_WORDS_IN_SENTENCE_GENERATION))
     {
       amount ++;
       current_word = get_next_random_word(current_word);
-      printf("%s ", current_word->word);
+      printf(" %s", current_word->word);
     }
   printf("\n");
   return amount;
