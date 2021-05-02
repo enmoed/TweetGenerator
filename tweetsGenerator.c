@@ -204,7 +204,7 @@ int add_word_to_probability_list(WordStruct *first_word,
 {
   if (strcmp(&first_word->word[strlen(first_word->word)-ONE], ".") == ZERO)
     {
-      return ZERO;
+      return ONE;
     }
   if (first_word->prob_list == NULL)
     {
@@ -219,7 +219,7 @@ int add_word_to_probability_list(WordStruct *first_word,
     }
   else if (check_word_in_prob_list(first_word, second_word) == SUCCESS)
     {
-      return ONE;
+      return ZERO;
     }
   first_word->len_of_prob_list ++;
   WordProbability *temp = (WordProbability*) realloc(first_word->prob_list,
@@ -229,7 +229,7 @@ int add_word_to_probability_list(WordStruct *first_word,
   first_word->prob_list[first_word->len_of_prob_list-ONE].word_struct_ptr =
       second_word;
   first_word->prob_list[first_word->len_of_prob_list-ONE].amount = ONE;
-  return ZERO;
+  return ONE;
 }
 
 /**
